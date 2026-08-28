@@ -15,45 +15,6 @@ function normalizePhone(value = '') {
   if ((phone.length === 12 || phone.length === 13) && phone.startsWith('55')) phone = phone.slice(2);
   return phone;
 }
-function parseBody(req) {
-  if (!req.body) return {};
-  if (typeof req.body === 'object') return req.body;
-  try { return JSON.parse(req.body); } catch { return {}; }
-}
-function allSame(value) { return /^(\d)\1+$/.test(value); }
-function validCpf(cpf) {
-  cpf = digits(cpf);
-  if (cpf.length !== 11 || allSame(cpf)) return false;
-  for (let position = 9; position <= 10; position += 1) {
-    let sum = 0;
-    for (let i = 0; i < position; i += 1) sum += Number(cpf[i]) * (position + 1 - i);
-    let digit = (sum * 10) % 11;
-    if (digit === 10) digit = 0;
-    if (digit !== Number(cpf[position])) return false;
-  }
-  return true;
-}
-function validCnpj(cnpj) {
-  cnpj = digits(cnpj);
-  if (cnpj.length !== 14 || allSame(cnpj)) return false;
-  const calc = (base) => {
-    let factor = base.length - 7;
-    let sum = 0;
-    for (const char of base) {
-      sum += Number(char) * factor--;
-      if (factor < 2) factor = 9;
-    }
-    const result = 11 - (sum % 11);
-    return result > 9 ? 0 : result;
-  };
-  const d1 = calc(cnpj.slice(0, 12));
-  const d2 = calc(cnpj.slice(0, 12) + d1);
-  return cnpj.endsWith(`${d1}${d2}`);
-}
-function validTaxId(value = '') {
-  const taxId = digits(value);
-  return taxId.length === 11 ? validCpf(taxId) : taxId.length === 14 ? validCnpj(taxId) : false;
-}
 function normalizePayer(input = {}) {
   return {
     name: String(input.name || '').trim(),
@@ -66,8 +27,13 @@ function validatePayer(payer) {
   if (payer.name.length < 3 || !payer.name.includes(' ')) return 'Informe nome e sobrenome.';
   if (!validEmail(payer.email)) return 'Informe um e-mail válido.';
   if (![10, 11].includes(payer.phone.length)) return 'Informe um celular válido com DDD.';
-  if (!validTaxId(payer.taxId)) return 'Informe um CPF ou CNPJ válido.';
+  if (![11, 14].includes(payer.taxId.length)) return 'Informe um CPF/CNPJ válido.';
   return '';
+}
+function parseBody(req) {
+  if (!req.body) return {};
+  if (typeof req.body === 'object') return req.body;
+  try { return JSON.parse(req.body); } catch { return {}; }
 }
 function makeExternalRef() {
   return `deulaudo_precbr_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
@@ -146,11 +112,7 @@ module.exports = async function handler(req, res) {
     catch { data = { message: raw || 'Resposta inválida do gateway.' }; }
 
     if (!providerResponse.ok) {
-      console.error('PayShark error', {
-        status: providerResponse.status,
-        response: data,
-        externalRef
-      });
+      console.error('Erro PayShark:', providerResponse.status, data);
       return res.status(providerResponse.status >= 500 ? 502 : providerResponse.status).json({
         success: false,
         message: data?.message || data?.errorMessage || 'Não foi possível gerar o Pix.',
@@ -162,7 +124,7 @@ module.exports = async function handler(req, res) {
 
     const pixCode = data?.data?.copypaste;
     if (!pixCode) {
-      console.error('PayShark response without PIX code', { response: data, externalRef });
+      console.error('Resposta sem data.copypaste:', data);
       return res.status(502).json({ success: false, message: 'O gateway não retornou o código Pix.' });
     }
 
