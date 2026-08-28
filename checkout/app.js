@@ -17,6 +17,40 @@ function normalizePhone(value = '') {
   if ((phone.length === 12 || phone.length === 13) && phone.startsWith('55')) phone = phone.slice(2);
   return phone;
 }
+function allSame(value) { return /^(\d)\1+$/.test(value); }
+function validCpf(cpf) {
+  cpf = digits(cpf);
+  if (cpf.length !== 11 || allSame(cpf)) return false;
+  for (let position = 9; position <= 10; position += 1) {
+    let sum = 0;
+    for (let i = 0; i < position; i += 1) sum += Number(cpf[i]) * (position + 1 - i);
+    let digit = (sum * 10) % 11;
+    if (digit === 10) digit = 0;
+    if (digit !== Number(cpf[position])) return false;
+  }
+  return true;
+}
+function validCnpj(cnpj) {
+  cnpj = digits(cnpj);
+  if (cnpj.length !== 14 || allSame(cnpj)) return false;
+  const calc = (base) => {
+    let factor = base.length - 7;
+    let sum = 0;
+    for (const char of base) {
+      sum += Number(char) * factor--;
+      if (factor < 2) factor = 9;
+    }
+    const result = 11 - (sum % 11);
+    return result > 9 ? 0 : result;
+  };
+  const d1 = calc(cnpj.slice(0, 12));
+  const d2 = calc(cnpj.slice(0, 12) + d1);
+  return cnpj.endsWith(`${d1}${d2}`);
+}
+function validTaxId(value = '') {
+  const taxId = digits(value);
+  return taxId.length === 11 ? validCpf(taxId) : taxId.length === 14 ? validCnpj(taxId) : false;
+}
 function payerData() {
   return {
     name: document.getElementById('name').value.trim(),
@@ -30,7 +64,7 @@ function validate() {
   if (payer.name.length < 3 || !payer.name.includes(' ')) return { error: 'Informe nome e sobrenome.' };
   if (!validEmail(payer.email)) return { error: 'Informe um e-mail válido.' };
   if (![10, 11].includes(payer.phone.length)) return { error: 'Informe um celular válido com DDD.' };
-  if (![11, 14].includes(payer.taxId.length)) return { error: 'Informe um CPF ou CNPJ válido.' };
+  if (!validTaxId(payer.taxId)) return { error: 'Informe um CPF ou CNPJ válido.' };
   return { payer };
 }
 function setMessage(message = '') {
@@ -87,12 +121,14 @@ form.addEventListener('submit', async (event) => {
     const response = await fetch('/api/create-pix', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payer: data.payer })
+      body: JSON.stringify(data.payer)
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok || !result.success) {
       const details = formatGatewayDetails(result.details);
-      throw new Error([result.message || 'Não foi possível gerar o Pix.', details].filter(Boolean).join(' — '));
+      const gateway = result.gatewayStatus ? `gateway ${result.gatewayStatus}` : '';
+      const code = result.providerCode ? `código ${result.providerCode}` : '';
+      throw new Error([result.message || 'Não foi possível gerar o Pix.', gateway, code, details].filter(Boolean).join(' — '));
     }
     currentPixCode = result.pixCode;
     pixCodeField.value = currentPixCode;
