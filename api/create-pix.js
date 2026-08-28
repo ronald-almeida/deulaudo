@@ -28,31 +28,11 @@ function normalizePayer(input = {}) {
     taxId: digits(input.taxId)
   };
 }
-function normalizeAddress(input = {}) {
-  return {
-    zipCode: digits(input.zipCode),
-    street: String(input.street || '').trim(),
-    number: String(input.number || '').trim(),
-    complement: String(input.complement || '').trim(),
-    district: String(input.district || '').trim(),
-    city: String(input.city || '').trim(),
-    state: String(input.state || '').trim().toUpperCase()
-  };
-}
 function validatePayer(payer) {
   if (payer.name.length < 3 || !payer.name.includes(' ')) return 'Informe nome e sobrenome.';
   if (!validEmail(payer.email)) return 'Informe um e-mail válido.';
   if (![10, 11].includes(payer.phone.length)) return 'Informe um celular válido com DDD.';
   if (![11, 14].includes(payer.taxId.length)) return 'Informe um CPF ou CNPJ válido.';
-  return '';
-}
-function validateAddress(address) {
-  if (address.zipCode.length !== 8) return 'Informe um CEP válido.';
-  if (address.street.length < 3) return 'Informe o endereço corretamente.';
-  if (!address.number) return 'Informe o número do endereço.';
-  if (!address.district) return 'Informe o bairro.';
-  if (!address.city) return 'Informe a cidade.';
-  if (address.state.length !== 2) return 'Informe o estado.';
   return '';
 }
 function makeExternalRef() { return `deulaudo_precbr_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`; }
@@ -82,11 +62,8 @@ module.exports = async function handler(req, res) {
 
     const body = parseBody(req);
     const payer = normalizePayer(body.payer);
-    const address = normalizeAddress(body.address);
     const payerError = validatePayer(payer);
     if (payerError) return res.status(400).json({ success: false, message: payerError });
-    const addressError = validateAddress(address);
-    if (addressError) return res.status(400).json({ success: false, message: addressError });
 
     const externalRef = makeExternalRef();
     const payload = {
@@ -99,24 +76,28 @@ module.exports = async function handler(req, res) {
       items: [{ quantity: 1, name: PRODUCT.name, price: PRODUCT.amount, type: PRODUCT.type }]
     };
 
-    // O checkout coleta endereço, mas o produto é DIGITAL.
-    // O endereço não é enviado em delivery para evitar validações desnecessárias do gateway.
-
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     let providerResponse;
     try {
       providerResponse = await fetch(`${API_BASE}/v1/payment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json', Authorization: `Bearer ${apiKey}` },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${apiKey}`
+        },
         body: JSON.stringify(payload),
         signal: controller.signal
       });
-    } finally { clearTimeout(timeout); }
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const raw = await providerResponse.text();
     let data = {};
-    try { data = raw ? JSON.parse(raw) : {}; } catch { data = { message: raw || 'Resposta inválida do gateway.' }; }
+    try { data = raw ? JSON.parse(raw) : {}; }
+    catch { data = { message: raw || 'Resposta inválida do gateway.' }; }
 
     if (!providerResponse.ok) {
       return res.status(providerResponse.status >= 500 ? 502 : providerResponse.status).json({
@@ -130,9 +111,17 @@ module.exports = async function handler(req, res) {
     const pixCode = data?.data?.copypaste;
     if (!pixCode) return res.status(502).json({ success: false, message: 'O gateway não retornou o código Pix.' });
 
-    return res.status(200).json({ success: true, paymentId: data?.id || null, externalRef, amount: PRODUCT.amount, pixCode });
+    return res.status(200).json({
+      success: true,
+      paymentId: data?.id || null,
+      externalRef,
+      amount: PRODUCT.amount,
+      pixCode
+    });
   } catch (error) {
-    if (error?.name === 'AbortError') return res.status(504).json({ success: false, message: 'O serviço de pagamento demorou para responder. Tente novamente.' });
+    if (error?.name === 'AbortError') {
+      return res.status(504).json({ success: false, message: 'O serviço de pagamento demorou para responder. Tente novamente.' });
+    }
     console.error('Erro interno ao criar Pix:', error);
     return res.status(500).json({ success: false, message: 'Erro interno ao gerar o Pix. Tente novamente.' });
   }
