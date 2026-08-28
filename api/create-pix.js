@@ -63,7 +63,13 @@ module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
   if (req.method === 'GET') {
-    return res.status(200).json({ success: true, service: 'create-pix', product: PRODUCT.name, amount: PRODUCT.amount, apiKeyConfigured: Boolean(String(process.env.PAYSHARK_API_KEY || '').trim()) });
+    return res.status(200).json({
+      success: true,
+      service: 'create-pix',
+      product: PRODUCT.name,
+      amount: PRODUCT.amount,
+      apiKeyConfigured: Boolean(String(process.env.PAYSHARK_API_KEY || '').trim())
+    });
   }
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'GET, POST');
@@ -93,6 +99,9 @@ module.exports = async function handler(req, res) {
       items: [{ quantity: 1, name: PRODUCT.name, price: PRODUCT.amount, type: PRODUCT.type }]
     };
 
+    // O checkout coleta endereço, mas o produto é DIGITAL.
+    // O endereço não é enviado em delivery para evitar validações desnecessárias do gateway.
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     let providerResponse;
@@ -110,11 +119,17 @@ module.exports = async function handler(req, res) {
     try { data = raw ? JSON.parse(raw) : {}; } catch { data = { message: raw || 'Resposta inválida do gateway.' }; }
 
     if (!providerResponse.ok) {
-      return res.status(providerResponse.status >= 500 ? 502 : providerResponse.status).json({ success: false, message: data?.message || data?.errorMessage || 'Não foi possível gerar o Pix.', gatewayStatus: providerResponse.status, details: data?.errors || data?.error || data?.details || null });
+      return res.status(providerResponse.status >= 500 ? 502 : providerResponse.status).json({
+        success: false,
+        message: data?.message || data?.errorMessage || 'Não foi possível gerar o Pix.',
+        gatewayStatus: providerResponse.status,
+        details: data?.errors || data?.error || data?.details || null
+      });
     }
 
     const pixCode = data?.data?.copypaste;
     if (!pixCode) return res.status(502).json({ success: false, message: 'O gateway não retornou o código Pix.' });
+
     return res.status(200).json({ success: true, paymentId: data?.id || null, externalRef, amount: PRODUCT.amount, pixCode });
   } catch (error) {
     if (error?.name === 'AbortError') return res.status(504).json({ success: false, message: 'O serviço de pagamento demorou para responder. Tente novamente.' });
