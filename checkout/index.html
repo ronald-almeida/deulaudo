@@ -1,1 +1,203 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/><meta name="theme-color" content="#ffffff"/><meta name="description" content="Checkout Pré-CBR - Extensivo"/><title>Pré-CBR - Extensivo | Checkout</title><link rel="stylesheet" href="/checkout/styles.css"/><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script><script src="/checkout/app.js" defer></script></head><body><main class="checkout-shell"><section class="checkout-card"><header class="seller-row"><img src="/checkout/avatar.png" class="seller-avatar" alt="Deulaudo"/><span>Deulaudo</span></header><div class="secure-bar"><span class="secure-icon" aria-hidden="true"><svg viewBox="0 0 512 512"><path fill="currentColor" d="M231.1 7.9c16-6.8 34-6.8 50 0L457.8 82.8c22 9.3 38.4 31 38.3 57.2-.5 99.2-41.3 280.7-213.7 363.2-16.7 8-36.1 8-52.7 0-172.4-82.5-213.1-264-213.6-363.2-.1-26.2 16.3-47.9 38.3-57.2L231.1 7.9zm37.5 29.4c-8-3.4-17-3.4-25 0l-176.7 75c-11.3 4.8-18.8 15.5-18.8 27.6 .5 94 39.3 259.8 195.4 334.5 7.9 3.8 17.2 3.8 25.1 0 156.1-74.7 195-240.4 195.5-334.5 .1-12.1-7.5-22.8-18.8-27.6l-176.7-75zm54.5 132.9c5.2-7.1 15.2-8.7 22.3-3.5s8.7 15.2 3.5 22.3L243.4 334.2c-2.8 3.8-7.1 6.2-11.8 6.5s-9.3-1.4-12.6-4.8l-54.4-56.3c-6.1-6.4-6-16.5 .4-22.6s16.5-5.9 22.6 .4l41.2 42.6 94.4-129.8z"></path></svg></span><span>COMPRA SEGURA</span></div><section class="product-block"><div class="product-row"><img src="/checkout/product.png" class="product-logo" alt="Preparatório Provas do CBR"/><div class="product-title">Pré-CBR - Extensivo</div></div><button class="details-toggle" type="button" id="detailsToggle" aria-expanded="true"><span>Detalhe da Compra</span><span class="chevron">⌄</span></button><div id="detailsPanel" class="details-panel"><span>TOTAL</span><strong>R$ 697,00</strong></div></section><form id="checkoutForm" novalidate><section class="data-section"><div class="section-head"><h1>OS SEUS DADOS</h1><button type="button" class="country-button"><img alt="Brasil" src="https://cdn.jsdelivr.net/npm/twemoji@11.3.0/2/svg/1f1e7-1f1f7.svg"/><span>Alterar País</span><span>⌄</span></button></div><label class="line-field"><span>Nome e sobrenome *</span><input id="name" type="text" autocomplete="name" required/></label><label class="line-field"><span>E-mail *</span><input id="email" type="email" autocomplete="email" required/></label><label class="line-field phone-field"><span class="phone-prefix"><img alt="Brasil" src="https://cdn.jsdelivr.net/npm/twemoji@11.3.0/2/svg/1f1e7-1f1f7.svg"/><span>⌄</span></span><span class="phone-label">Celular *</span><input id="phone" type="tel" inputmode="numeric" autocomplete="tel" required/></label><label class="line-field"><span>CPF / CNPJ *</span><input id="taxId" type="text" inputmode="numeric" required/></label><div class="address-grid"><label class="line-field"><span>CEP *</span><input id="zipCode" type="text" inputmode="numeric" autocomplete="postal-code" required/><span class="field-status" id="zipStatus"></span></label><label class="line-field"><span>Endereço *</span><input id="street" type="text" autocomplete="address-line1" required/></label><label class="line-field"><span>Número *</span><input id="number" type="text" autocomplete="address-line2" required/></label><label class="line-field"><span>Compl.</span><input id="complement" type="text" autocomplete="address-line2"/></label><label class="line-field"><span>Bairro *</span><input id="district" type="text" required/></label><label class="line-field"><span>Cidade *</span><input id="city" type="text" autocomplete="address-level2" required/></label><label class="line-field"><span>Estado *</span><select id="state" autocomplete="address-level1" required><option value=""></option><option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option></select></label></div></section><section class="payment-section"><h2>MÉTODO DE PAGAMENTO</h2><div class="payment-choice"><span class="pix-icon" aria-hidden="true">▦</span><span>PIX</span></div><div class="attention-box"><div class="attention-title">ⓘ ATENÇÃO A ESTES DETALHES:</div><ul><li>Somente à vista;</li><li>O produto será liberado somente após a confirmação do pagamento;</li><li>Finalize o pagamento dentro do prazo exibido no seu aplicativo bancário.</li></ul></div><div id="formAlert" class="form-alert hidden">*Existem campos inválidos ou não preenchidos</div><p id="formMessage" class="form-message" role="alert" aria-live="polite"></p><button id="generatePixBtn" class="buy-button" type="submit">Comprar Agora</button></section></form></section></main><div id="pixModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="pixModalTitle"><div class="modal-backdrop" data-close-modal></div><div class="modal-card"><div class="modal-handle"></div><button type="button" class="modal-close" data-close-modal aria-label="Fechar">×</button><div class="modal-heading"><div class="modal-pix-icon">▦</div><div><span class="eyebrow">Pagamento instantâneo</span><h2 id="pixModalTitle">Pague com Pix</h2></div></div><div class="amount-card"><span>Total da compra</span><strong>R$ 697,00</strong></div><p class="modal-instruction">Escaneie o QR Code com o aplicativo do seu banco ou copie o código Pix abaixo.</p><div class="qr-shell"><div id="modalQr" class="qr-container"></div></div><label class="pix-code-label" for="pixCode">Pix Copia e Cola</label><textarea id="pixCode" readonly rows="4"></textarea><button id="copyPixBtn" class="copy-button" type="button">Copiar código Pix</button><div class="modal-secure">🔒 Pagamento processado com segurança</div></div></div></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="Checkout Pré-CBR - Extensivo" />
+  <title>Pré-CBR - Extensivo | Checkout</title>
+  <link rel="stylesheet" href="/checkout/styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <script src="/checkout/app.js" defer></script>
+</head>
+<body>
+  <main class="checkout-shell">
+    <section class="checkout-card">
+      <aside class="summary-column">
+        <header class="seller-row">
+          <img src="/checkout/avatar.png" class="seller-avatar" alt="Deulaudo" />
+          <span>Deulaudo</span>
+        </header>
+
+        <div class="secure-bar">
+          <span class="secure-icon" aria-hidden="true">
+            <svg viewBox="0 0 512 512" role="img"><path fill="currentColor" d="M231.1 7.9c16-6.8 34-6.8 50 0L457.8 82.8c22 9.3 38.4 31 38.3 57.2-.5 99.2-41.3 280.7-213.7 363.2-16.7 8-36.1 8-52.7 0-172.4-82.5-213.1-264-213.6-363.2-.1-26.2 16.3-47.9 38.3-57.2L231.1 7.9zm37.5 29.4c-8-3.4-17-3.4-25 0l-176.7 75c-11.3 4.8-18.8 15.5-18.8 27.6 .5 94 39.3 259.8 195.4 334.5 7.9 3.8 17.2 3.8 25.1 0 156.1-74.7 195-240.4 195.5-334.5 .1-12.1-7.5-22.8-18.8-27.6l-176.7-75zm54.5 132.9c5.2-7.1 15.2-8.7 22.3-3.5s8.7 15.2 3.5 22.3L243.4 334.2c-2.8 3.8-7.1 6.2-11.8 6.5s-9.3-1.4-12.6-4.8l-54.4-56.3c-6.1-6.4-6-16.5 .4-22.6s16.5-5.9 22.6 .4l41.2 42.6 94.4-129.8z"></path></svg>
+          </span>
+          <span>COMPRA SEGURA</span>
+        </div>
+
+        <section class="product-panel">
+          <div class="product-row">
+            <img src="/checkout/product.png" class="product-logo" alt="Preparatório Provas do CBR" />
+            <div class="product-title">Pré-CBR - Extensivo</div>
+          </div>
+
+          <button class="details-toggle" type="button" id="detailsToggle" aria-expanded="true">
+            <span>Detalhe da Compra</span>
+            <span class="chevron">⌄</span>
+          </button>
+
+          <div id="detailsPanel" class="details-panel">
+            <div class="detail-line">
+              <span>Produto</span>
+              <strong>R$ 697,00</strong>
+            </div>
+            <div class="detail-line total-line">
+              <span>TOTAL</span>
+              <strong>R$ 697,00</strong>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <form id="checkoutForm" class="form-column" novalidate>
+        <section class="data-section card-block">
+          <div class="section-head">
+            <h1>OS SEUS DADOS</h1>
+            <button type="button" class="country-button" aria-label="Alterar país">
+              <img alt="Brasil" src="https://cdn.jsdelivr.net/npm/twemoji@11.3.0/2/svg/1f1e7-1f1f7.svg" />
+              <span>Alterar País</span>
+              <span class="country-caret">⌄</span>
+            </button>
+          </div>
+
+          <div class="fields-grid fields-grid-main">
+            <label class="line-field full" data-field="name">
+              <span class="field-label">Nome e sobrenome *</span>
+              <input id="name" type="text" autocomplete="name" required />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+
+            <label class="line-field full" data-field="email">
+              <span class="field-label">E-mail *</span>
+              <input id="email" type="email" autocomplete="email" required />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+
+            <label class="line-field phone-field" data-field="phone">
+              <span class="phone-prefix">
+                <img alt="Brasil" src="https://cdn.jsdelivr.net/npm/twemoji@11.3.0/2/svg/1f1e7-1f1f7.svg" />
+                <span>⌄</span>
+              </span>
+              <span class="field-label">Celular *</span>
+              <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" required />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+
+            <label class="line-field" data-field="taxId">
+              <span class="field-label">CPF / CNPJ *</span>
+              <input id="taxId" type="text" inputmode="numeric" required />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <div class="fields-grid address-grid">
+            <label class="line-field" data-field="zipCode">
+              <span class="field-label">CEP *</span>
+              <input id="zipCode" type="text" inputmode="numeric" autocomplete="postal-code" required />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+
+            <label class="line-field span-2" data-field="street">
+              <span class="field-label">Endereço *</span>
+              <input id="street" type="text" autocomplete="address-line1" required />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+
+            <label class="line-field" data-field="number">
+              <span class="field-label">Número *</span>
+              <input id="number" type="text" autocomplete="address-line2" required />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+
+            <label class="line-field" data-field="complement">
+              <span class="field-label">Compl.</span>
+              <input id="complement" type="text" autocomplete="address-line2" />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+
+            <label class="line-field" data-field="district">
+              <span class="field-label">Bairro *</span>
+              <input id="district" type="text" required />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+
+            <label class="line-field" data-field="city">
+              <span class="field-label">Cidade *</span>
+              <input id="city" type="text" autocomplete="address-level2" required />
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+
+            <label class="line-field" data-field="state">
+              <span class="field-label">Estado *</span>
+              <select id="state" autocomplete="address-level1" required>
+                <option value=""></option>
+                <option>AC</option><option>AL</option><option>AP</option><option>AM</option><option>BA</option><option>CE</option><option>DF</option><option>ES</option><option>GO</option><option>MA</option><option>MT</option><option>MS</option><option>MG</option><option>PA</option><option>PB</option><option>PR</option><option>PE</option><option>PI</option><option>RJ</option><option>RN</option><option>RS</option><option>RO</option><option>RR</option><option>SC</option><option>SP</option><option>SE</option><option>TO</option>
+              </select>
+              <small class="field-meta"></small>
+              <span class="field-mark" aria-hidden="true"></span>
+            </label>
+          </div>
+        </section>
+
+        <section class="payment-section card-block">
+          <h2>MÉTODO DE PAGAMENTO</h2>
+          <div class="payment-choice" aria-label="Método de pagamento Pix">
+            <span class="pix-icon" aria-hidden="true">
+              <svg viewBox="0 0 448 512" role="img"><path fill="currentColor" d="M144 64c8.8 0 16 7.2 16 16l0 96c0 8.8-7.2 16-16 16l-96 0c-8.8 0-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16l96 0zM48 32C21.5 32 0 53.5 0 80l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-26.5-21.5-48-48-48L48 32zM160 336l0 96c0 8.8-7.2 16-16 16l-96 0c-8.8 0-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16l96 0c8.8 0 16 7.2 16 16zM48 288c-26.5 0-48 21.5-48 48l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-26.5-21.5-48-48-48l-96 0zM304 64l96 0c8.8 0 16 7.2 16 16l0 96c0 8.8-7.2 16-16 16l-96 0c-8.8 0-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16zM256 80l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-26.5-21.5-48-48-48l-96 0c-26.5 0-48 21.5-48 48zm8 240a24 24 0 1 0 48 0 24 24 0 1 0 -48 0zm0 128a24 24 0 1 0 48 0 24 24 0 1 0 -48 0zm152-24a24 24 0 1 0 0 48 24 24 0 1 0 0-48zM392 320a24 24 0 1 0 48 0 24 24 0 1 0 -48 0zm-40 40a24 24 0 1 0 0 48 24 24 0 1 0 0-48zM96 104a24 24 0 1 0 0 48 24 24 0 1 0 0-48zM72 384a24 24 0 1 0 48 0 24 24 0 1 0 -48 0zM352 104a24 24 0 1 0 0 48 24 24 0 1 0 0-48z"></path></svg>
+            </span>
+            <span>PIX</span>
+          </div>
+
+          <div class="attention-box">
+            <div class="attention-title">ⓘ ATENÇÃO A ESTES DETALHES:</div>
+            <ul>
+              <li>Somente à vista;</li>
+              <li>O produto será liberado somente após a confirmação do pagamento;</li>
+              <li>Finalize o pagamento dentro do prazo exibido no seu aplicativo bancário.</li>
+            </ul>
+          </div>
+
+          <div id="formAlert" class="form-alert hidden">*Existem campos inválidos ou não preenchidos</div>
+          <p id="formMessage" class="form-message" role="alert" aria-live="polite"></p>
+          <button id="generatePixBtn" class="buy-button" type="submit">Comprar Agora</button>
+        </section>
+      </form>
+    </section>
+  </main>
+
+  <div id="pixModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="pixModalTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-card">
+      <div class="modal-handle"></div>
+      <button type="button" class="modal-close" data-close-modal aria-label="Fechar">×</button>
+      <div class="modal-heading">
+        <div class="modal-pix-icon" aria-hidden="true">
+          <svg viewBox="0 0 448 512"><path fill="currentColor" d="M144 64c8.8 0 16 7.2 16 16l0 96c0 8.8-7.2 16-16 16l-96 0c-8.8 0-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16l96 0zM48 32C21.5 32 0 53.5 0 80l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-26.5-21.5-48-48-48L48 32zM160 336l0 96c0 8.8-7.2 16-16 16l-96 0c-8.8 0-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16l96 0c8.8 0 16 7.2 16 16zM48 288c-26.5 0-48 21.5-48 48l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-26.5-21.5-48-48-48l-96 0zM304 64l96 0c8.8 0 16 7.2 16 16l0 96c0 8.8-7.2 16-16 16l-96 0c-8.8 0-16-7.2-16-16l0-96c0-8.8 7.2-16 16-16zM256 80l0 96c0 26.5 21.5 48 48 48l96 0c26.5 0 48-21.5 48-48l0-96c0-26.5-21.5-48-48-48l-96 0c-26.5 0-48 21.5-48 48zm8 240a24 24 0 1 0 48 0 24 24 0 1 0 -48 0zm0 128a24 24 0 1 0 48 0 24 24 0 1 0 -48 0zm152-24a24 24 0 1 0 0 48 24 24 0 1 0 0-48zM392 320a24 24 0 1 0 48 0 24 24 0 1 0 -48 0zm-40 40a24 24 0 1 0 0 48 24 24 0 1 0 0-48zM96 104a24 24 0 1 0 0 48 24 24 0 1 0 0-48zM72 384a24 24 0 1 0 48 0 24 24 0 1 0 -48 0zM352 104a24 24 0 1 0 0 48 24 24 0 1 0 0-48z"></path></svg>
+        </div>
+        <div>
+          <span class="eyebrow">Pagamento instantâneo</span>
+          <h2 id="pixModalTitle">Pague com Pix</h2>
+        </div>
+      </div>
+      <div class="amount-card"><span>Total da compra</span><strong>R$ 697,00</strong></div>
+      <p class="modal-instruction">Escaneie o QR Code com o aplicativo do seu banco ou copie o código Pix abaixo.</p>
+      <div class="qr-shell"><div id="modalQr" class="qr-container"></div></div>
+      <label class="pix-code-label" for="pixCode">Pix Copia e Cola</label>
+      <textarea id="pixCode" readonly rows="4"></textarea>
+      <button id="copyPixBtn" class="copy-button" type="button">Copiar código Pix</button>
+      <div class="modal-secure">🔒 Pagamento processado com segurança</div>
+    </div>
+  </div>
+</body>
+</html>
