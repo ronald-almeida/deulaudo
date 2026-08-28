@@ -3,7 +3,7 @@ const API_BASE = 'https://api.gatewaypayshark.com.br';
 const PRODUCT = Object.freeze({
   name: 'Pré-CBR - Extensivo',
   description: 'Pré-CBR - Extensivo',
-  amount: 59700,
+  amount: 49700,
   currency: 'BRL',
   type: 'DIGITAL'
 });
