@@ -20,6 +20,40 @@ function parseBody(req) {
   if (typeof req.body === 'object') return req.body;
   try { return JSON.parse(req.body); } catch { return {}; }
 }
+function allSame(value) { return /^(\d)\1+$/.test(value); }
+function validCpf(cpf) {
+  cpf = digits(cpf);
+  if (cpf.length !== 11 || allSame(cpf)) return false;
+  for (let position = 9; position <= 10; position += 1) {
+    let sum = 0;
+    for (let i = 0; i < position; i += 1) sum += Number(cpf[i]) * (position + 1 - i);
+    let digit = (sum * 10) % 11;
+    if (digit === 10) digit = 0;
+    if (digit !== Number(cpf[position])) return false;
+  }
+  return true;
+}
+function validCnpj(cnpj) {
+  cnpj = digits(cnpj);
+  if (cnpj.length !== 14 || allSame(cnpj)) return false;
+  const calc = (base) => {
+    let factor = base.length - 7;
+    let sum = 0;
+    for (const char of base) {
+      sum += Number(char) * factor--;
+      if (factor < 2) factor = 9;
+    }
+    const result = 11 - (sum % 11);
+    return result > 9 ? 0 : result;
+  };
+  const d1 = calc(cnpj.slice(0, 12));
+  const d2 = calc(cnpj.slice(0, 12) + d1);
+  return cnpj.endsWith(`${d1}${d2}`);
+}
+function validTaxId(value = '') {
+  const taxId = digits(value);
+  return taxId.length === 11 ? validCpf(taxId) : taxId.length === 14 ? validCnpj(taxId) : false;
+}
 function normalizePayer(input = {}) {
   return {
     name: String(input.name || '').trim(),
@@ -32,10 +66,12 @@ function validatePayer(payer) {
   if (payer.name.length < 3 || !payer.name.includes(' ')) return 'Informe nome e sobrenome.';
   if (!validEmail(payer.email)) return 'Informe um e-mail válido.';
   if (![10, 11].includes(payer.phone.length)) return 'Informe um celular válido com DDD.';
-  if (![11, 14].includes(payer.taxId.length)) return 'Informe um CPF ou CNPJ válido.';
+  if (!validTaxId(payer.taxId)) return 'Informe um CPF ou CNPJ válido.';
   return '';
 }
-function makeExternalRef() { return `deulaudo_precbr_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`; }
+function makeExternalRef() {
+  return `deulaudo_precbr_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -51,6 +87,7 @@ module.exports = async function handler(req, res) {
       apiKeyConfigured: Boolean(String(process.env.PAYSHARK_API_KEY || '').trim())
     });
   }
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({ success: false, message: 'Método não permitido.' });
@@ -60,10 +97,9 @@ module.exports = async function handler(req, res) {
     const apiKey = String(process.env.PAYSHARK_API_KEY || '').trim();
     if (!apiKey) return res.status(500).json({ success: false, message: 'Configuração de pagamento indisponível.' });
 
-    const body = parseBody(req);
-    const payer = normalizePayer(body.payer);
-    const payerError = validatePayer(payer);
-    if (payerError) return res.status(400).json({ success: false, message: payerError });
+    const payer = normalizePayer(parseBody(req));
+    const validationError = validatePayer(payer);
+    if (validationError) return res.status(400).json({ success: false, message: validationError });
 
     const externalRef = makeExternalRef();
     const payload = {
@@ -72,8 +108,18 @@ module.exports = async function handler(req, res) {
       method: 'PIX',
       description: PRODUCT.description,
       externalRef,
-      payer,
-      items: [{ quantity: 1, name: PRODUCT.name, price: PRODUCT.amount, type: PRODUCT.type }]
+      payer: {
+        name: payer.name,
+        taxId: payer.taxId,
+        email: payer.email,
+        phone: payer.phone
+      },
+      items: [{
+        quantity: 1,
+        name: PRODUCT.name,
+        price: PRODUCT.amount,
+        type: PRODUCT.type
+      }]
     };
 
     const controller = new AbortController();
@@ -100,16 +146,25 @@ module.exports = async function handler(req, res) {
     catch { data = { message: raw || 'Resposta inválida do gateway.' }; }
 
     if (!providerResponse.ok) {
+      console.error('PayShark error', {
+        status: providerResponse.status,
+        response: data,
+        externalRef
+      });
       return res.status(providerResponse.status >= 500 ? 502 : providerResponse.status).json({
         success: false,
         message: data?.message || data?.errorMessage || 'Não foi possível gerar o Pix.',
         gatewayStatus: providerResponse.status,
+        providerCode: data?.code || data?.errorCode || null,
         details: data?.errors || data?.error || data?.details || null
       });
     }
 
     const pixCode = data?.data?.copypaste;
-    if (!pixCode) return res.status(502).json({ success: false, message: 'O gateway não retornou o código Pix.' });
+    if (!pixCode) {
+      console.error('PayShark response without PIX code', { response: data, externalRef });
+      return res.status(502).json({ success: false, message: 'O gateway não retornou o código Pix.' });
+    }
 
     return res.status(200).json({
       success: true,
